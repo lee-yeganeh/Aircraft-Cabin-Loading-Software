@@ -99,54 +99,79 @@ namespace PassengerAirplane
             }
 
         }
-        // Find the location of new seat in a way that the airplane is balanced.
-        // Compare 4 sides of the plane to find the balanced location.
-        // Returns the row and column of the seat.
-        public (int,int) freeSeatIndex(int countOfSeats)
-        {
 
+        // Find the location of new seat in a way that the airplane is balanced.
+        // Arrange seats based on diagonals of the plan.
+        // Compare  up/down and left/right side of the plane.
+        // Find the seat location based on their intersection. 
+        // Returns the row and column of the seat.
+
+        public (int, int) freeSeatIndex(int countOfSeats)
+        {
 
             var forwardRow = availableSeats(0, rows / 2, 0, seatsPerRow, countOfSeats);
             var aftRow = availableSeats(rows / 2, rows, 0, seatsPerRow, countOfSeats);
+            var leftCol = availableSeats(0, rows, 0, seatsPerRow/2, countOfSeats);
+            var rightCol = availableSeats(0, rows, seatsPerRow/2, seatsPerRow, countOfSeats);
 
 
-            int startRow, endRow;
-            int startColLeft = 0;
-            int endColLeft = seatsPerRow / 2;
-            int startColRight = seatsPerRow / 2;
-            int endColRight = seatsPerRow;
+            int startRow, endRow,startCol,endCol;
 
-            var result=(0,0);
-            var leftSeats = (0, 0, 0);
-            var rightSeats = (0, 0, 0);
-
-            if (aftRow.Item1 > forwardRow.Item1)
-            {
-                result = (aftRow.Item2, aftRow.Item3);
-                startRow = rows / 2;
-                endRow = rows;
-                
-            }
-            else
-            {
-                result = (forwardRow.Item2, forwardRow.Item3);
-                startRow = 0;
-                endRow = rows / 2;
-            }
+            var result = (0, 0,0);
+            var result2 = (0, 0);
 
             if (countOfSeats <= seatsPerRow / 2)
             {
-                leftSeats = availableSeats(startRow, endRow, startColLeft, endColLeft, countOfSeats);
-                rightSeats = availableSeats(startRow, endRow, startColRight, endColRight, countOfSeats);
-
-                if (rightSeats.Item1 > leftSeats.Item1)
-                    return (rightSeats.Item2, rightSeats.Item3);
-                else
-                    return (leftSeats.Item2, leftSeats.Item3);
+                if (forwardRow.Item1 >= aftRow.Item1 && leftCol.Item1 >= rightCol.Item1)
+                {
+                    startRow = 0;
+                    endRow = rows / 2;
+                    startCol = 0;
+                    endCol = seatsPerRow / 2;
+                    result = availableSeats(startRow, endRow, startCol, endCol, countOfSeats);
+                }
+                else if (forwardRow.Item1 >= aftRow.Item1 && leftCol.Item1 < rightCol.Item1)
+                {
+                    startRow = 0;
+                    endRow = rows / 2;
+                    startCol = seatsPerRow / 2;
+                    endCol = seatsPerRow;
+                    result = availableSeats(startRow, endRow, startCol, endCol, countOfSeats);
+                }
+                else if (forwardRow.Item1 < aftRow.Item1  && leftCol.Item1 >= rightCol.Item1)
+                {
+                    startRow = rows / 2;
+                    endRow = rows;
+                    startCol = 0;
+                    endCol = seatsPerRow / 2;
+                    result = availableSeats(startRow, endRow, startCol, endCol, countOfSeats);
+                }
+                else if (forwardRow.Item1 < aftRow.Item1 && leftCol.Item1 < rightCol.Item1)
+                {
+                    startRow = rows/2;
+                    endRow = rows;
+                    startCol = seatsPerRow / 2;
+                    endCol = seatsPerRow;
+                    result = availableSeats(startRow, endRow, startCol, endCol, countOfSeats);
+                }
+                return (result.Item2, result.Item3);
             }
             else
-                return result;
+            {
+                if (aftRow.Item1 > forwardRow.Item1)
+                {
+                    result2 = (aftRow.Item2, aftRow.Item3);
+
+                }
+                else
+                {
+                    result2 = (forwardRow.Item2, forwardRow.Item3);
+                }
+                return result2;
+            }
+            
         }
+
         // Find available seats in speicific part of the plane.
         // Check if there are free seats for a group to be added.
         // Returns the number of free seats and the location of first acceptable free seat.
